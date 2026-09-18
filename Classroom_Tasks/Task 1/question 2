@@ -1,0 +1,26 @@
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> marks = Arrays.asList(45, 78, 32, 90, 65, 88, 40, 95);
+
+        List<Integer> updated = marks.stream()
+                .filter(mark -> mark >= 60)
+                .map(mark -> mark + 5)
+                .sorted(Comparator.reverseOrder())
+                .toList();
+
+        System.out.println("Updated marks: " + updated);
+        System.out.println("Average: " + updated.stream()
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0));
+    }
+}
+
+
+//output
+
+
+//Updated marks: [100, 95, 93, 83, 70, 65]
+//Average: 84.33333333333333
