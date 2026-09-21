@@ -1,0 +1,129 @@
+import java.util.*;
+
+public class Main {
+
+    static long[][] add(long[][] A, long[][] B) {
+        int n = A.length;
+        long[][] C = new long[n][n];
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                C[i][j] = A[i][j] + B[i][j];
+
+        return C;
+    }
+
+    static long[][] sub(long[][] A, long[][] B) {
+        int n = A.length;
+        long[][] C = new long[n][n];
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                C[i][j] = A[i][j] - B[i][j];
+
+        return C;
+    }
+
+    static long[][] multiplyNormal(long[][] A, long[][] B) {
+        int n = A.length;
+        long[][] C = new long[n][n];
+
+        for (int i = 0; i < n; i++)
+            for (int k = 0; k < n; k++)
+                for (int j = 0; j < n; j++)
+                    C[i][j] += A[i][k] * B[k][j];
+
+        return C;
+    }
+
+    static long[][] strassen(long[][] A, long[][] B) {
+        int n = A.length;
+
+        if (n <= 2)
+            return multiplyNormal(A, B);
+
+        int m = n / 2;
+
+        long[][] A11 = new long[m][m];
+        long[][] A12 = new long[m][m];
+        long[][] A21 = new long[m][m];
+        long[][] A22 = new long[m][m];
+
+        long[][] B11 = new long[m][m];
+        long[][] B12 = new long[m][m];
+        long[][] B21 = new long[m][m];
+        long[][] B22 = new long[m][m];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < m; j++) {
+                A11[i][j] = A[i][j];
+                A12[i][j] = A[i][j + m];
+                A21[i][j] = A[i + m][j];
+                A22[i][j] = A[i + m][j + m];
+
+                B11[i][j] = B[i][j];
+                B12[i][j] = B[i][j + m];
+                B21[i][j] = B[i + m][j];
+                B22[i][j] = B[i + m][j + m];
+            }
+        }
+
+        long[][] M1 = strassen(add(A11, A22), add(B11, B22));
+        long[][] M2 = strassen(add(A21, A22), B11);
+        long[][] M3 = strassen(A11, sub(B12, B22));
+        long[][] M4 = strassen(A22, sub(B21, B11));
+        long[][] M5 = strassen(add(A11, A12), B22);
+        long[][] M6 = strassen(sub(A21, A11), add(B11, B12));
+        long[][] M7 = strassen(sub(A12, A22), add(B21, B22));
+
+        long[][] C11 = add(sub(add(M1, M4), M5), M7);
+        long[][] C12 = add(M3, M5);
+        long[][] C21 = add(M2, M4);
+        long[][] C22 = add(sub(add(M1, M3), M2), M6);
+
+        long[][] C = new long[n][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < m; j++) {
+                C[i][j] = C11[i][j];
+                C[i][j + m] = C12[i][j];
+                C[i + m][j] = C21[i][j];
+                C[i + m][j + m] = C22[i][j];
+            }
+        }
+
+        return C;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+
+        long[][] A = new long[n][n];
+        long[][] B = new long[n][n];
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                A[i][j] = sc.nextLong();
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                B[i][j] = sc.nextLong();
+
+        long[][] result = strassen(A, B);
+
+        StringBuilder out = new StringBuilder();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (j > 0)
+                    out.append(" ");
+                out.append(result[i][j]);
+            }
+            out.append("\n");
+        }
+
+        System.out.print(out);
+    }
+}
